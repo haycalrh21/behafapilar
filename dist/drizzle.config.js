@@ -4,6 +4,7 @@ export default defineConfig({
     schema: [
         "./src/db/userSchema.ts",
         "./src/db/candidateSchema.ts",
+        "./src/db/countrySchema.ts",
         "./src/db/partnerSchema.ts",
     ],
     dialect: "postgresql",

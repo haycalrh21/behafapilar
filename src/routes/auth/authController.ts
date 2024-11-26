@@ -17,8 +17,6 @@ const generateUserToken = (user: any) => {
 
 export async function loginUser(req: Request, res: Response): Promise<void> {
   try {
-    // Mencetak origin dan referer
-
     const { email, password } = req.body;
 
     const [user] = await db

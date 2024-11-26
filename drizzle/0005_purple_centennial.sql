@@ -1,0 +1,1 @@
+ALTER TABLE "partners" ADD COLUMN "phoneNumber" varchar(255) NOT NULL;

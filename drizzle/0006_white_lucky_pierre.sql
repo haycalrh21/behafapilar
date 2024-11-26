@@ -1,0 +1,1 @@
+ALTER TABLE "candidates" RENAME COLUMN "fullname" TO "firstname";

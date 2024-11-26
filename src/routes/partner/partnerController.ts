@@ -2,19 +2,36 @@ import { Request, Response } from "express";
 import { db } from "../../db/index.js";
 import { partnerTable } from "../../db/partnerSchema.js";
 
-export async function createPartner(req: Request, res: Response) {
-  const { fullname, lastname, email, country, message } = req.body;
+export async function createPartner(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const {
+    firstName,
+    lastName,
+    email,
+    country,
+    Message,
+    whatsapp,
+    companyWebsite,
+    companyName,
+  } = req.body;
 
   try {
+    // Insert into partnerTable
+
     // Insert into partnerTable
     const [partner] = await db
       .insert(partnerTable)
       .values({
-        fullname: fullname.trim(),
-        lastname: lastname.trim(),
-        email: email.trim(),
-        country: country.trim(),
-        message: message.trim(),
+        companyName,
+        companyWebsite,
+        firstName,
+        whatsapp,
+        lastName,
+        email,
+        country,
+        message: Message,
       })
       .returning(); // Returning the newly inserted row
 
@@ -23,5 +40,31 @@ export async function createPartner(req: Request, res: Response) {
   } catch (error) {
     console.error("Error creating partner:", error);
     res.status(500).json({ error: "Failed to create partner" });
+  }
+}
+
+export async function getPartners(req: Request, res: Response) {
+  try {
+    // Fetch all partners from the database
+    const partners = await db
+      .select({
+        id: partnerTable.id,
+        fullname: partnerTable.firstName,
+        lastname: partnerTable.lastName,
+        whatsapp: partnerTable.whatsapp,
+        companyName: partnerTable.companyName,
+        companyWebsite: partnerTable.companyWebsite,
+        email: partnerTable.email,
+        country: partnerTable.country,
+        message: partnerTable.message,
+        createdAt: partnerTable.createdAt,
+      })
+      .from(partnerTable);
+
+    // Respond with the fetched partners
+    res.json(partners);
+  } catch (error) {
+    console.error("Error fetching partners:", error);
+    res.status(500).json({ error: "Failed to fetch partners" });
   }
 }

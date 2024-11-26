@@ -4,6 +4,7 @@ import authRouter from "./routes/auth/index.js";
 
 import candidateRouter from "./routes/candidate/index.js";
 import partnerRouter from "./routes/partner/index.js";
+import countryRouter from "./routes/country/index.js";
 
 import cors from "cors";
 import serverless from "serverless-http";
@@ -48,9 +49,10 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.use("/auth", checkOrigin, authRouter);
+app.use("/auth", authRouter);
 app.use("/candidate", candidateRouter);
 app.use("/partner", partnerRouter);
+app.use("/country", countryRouter);
 
 if (process.env.NODE_ENV === "dev") {
   app.listen(port, () => {

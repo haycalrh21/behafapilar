@@ -1,0 +1,1 @@
+ALTER TABLE "partners" RENAME COLUMN "phoneNumber" TO "whatsapp";

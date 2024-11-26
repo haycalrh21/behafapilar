@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createPartner } from "./partnerController.js";
+import { createPartner, getPartners } from "./partnerController.js";
 const router = Router();
 // Skema validasi untuk mendukung array imageUrls
 // export const createBlogSchema = z.object({
@@ -20,7 +20,7 @@ const router = Router();
 //     )
 //     .nonempty("At least one image is required"),
 // });
-router.get("/");
+router.get("/", getPartners);
 router.get("/:id");
 router.post("/", createPartner);
 // router.delete("/:id", async (req, res) => {

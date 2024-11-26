@@ -6,6 +6,7 @@ export default defineConfig({
     "./src/db/userSchema.ts",
 
     "./src/db/candidateSchema.ts",
+    "./src/db/countrySchema.ts",
     "./src/db/partnerSchema.ts",
   ],
   dialect: "postgresql",
