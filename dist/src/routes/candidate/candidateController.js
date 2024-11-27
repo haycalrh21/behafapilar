@@ -1,5 +1,6 @@
 import { db } from "../../db/index.js";
 import { candidatesTable } from "../../db/candidateSchema.js";
+import { desc } from "drizzle-orm";
 // Tangani pembuatan form
 export const createForm = async (req, res) => {
     try {
@@ -54,7 +55,10 @@ export const createForm = async (req, res) => {
 };
 export async function getCandidates(req, res) {
     try {
-        // Fetch candidates from the database
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+        // Calculate offset for pagination
+        const offset = (page - 1) * limit;
         const candidates = await db
             .select({
             id: candidatesTable.id,
@@ -72,9 +76,57 @@ export async function getCandidates(req, res) {
             certificate: candidatesTable.certificate,
             createdAt: candidatesTable.createdAt,
         })
-            .from(candidatesTable);
+            .from(candidatesTable)
+            .limit(limit)
+            .offset(offset)
+            .orderBy(desc(candidatesTable.createdAt));
+        const totalCountResult = await db.$count(candidatesTable);
+        const totalCount = totalCountResult;
+        // Calculate total pages
+        const totalPages = Math.ceil(totalCount / limit);
         // Respond with the list of candidates directly
-        res.json(candidates);
+        res.json({
+            candidates,
+            currentPage: page,
+            totalCount: totalCount,
+            totalPages: totalPages,
+        });
+    }
+    catch (error) {
+        console.error("Error fetching candidates:", error);
+        res.status(500).send({
+            error: "An error occurred while fetching candidates",
+        });
+    }
+}
+export async function getall(req, res) {
+    try {
+        // Get query parameters for pagination
+        // Query to get candidates with pagination, sorted by createdAt ASC
+        const candidates = await db
+            .select({
+            id: candidatesTable.id,
+            fullname: candidatesTable.firstname,
+            lastname: candidatesTable.lastname,
+            dateOfBirth: candidatesTable.dateOfBirth,
+            gender: candidatesTable.gender,
+            status: candidatesTable.status,
+            passportNumber: candidatesTable.passportNumber,
+            email: candidatesTable.email,
+            phoneNumber: candidatesTable.phoneNumber,
+            department: candidatesTable.department,
+            position: candidatesTable.position,
+            cv: candidatesTable.cv,
+            certificate: candidatesTable.certificate,
+            createdAt: candidatesTable.createdAt,
+        })
+            .from(candidatesTable)
+            .orderBy(desc(candidatesTable.createdAt));
+        // Calculate total pages
+        // Send response with the data and pagination information
+        res.json({
+            candidates,
+        });
     }
     catch (error) {
         console.error("Error fetching candidates:", error);

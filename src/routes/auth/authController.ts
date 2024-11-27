@@ -56,21 +56,38 @@ export async function loginUser(req: Request, res: Response): Promise<void> {
 }
 
 export async function registerUser(req: Request, res: Response) {
-  const data = req.body;
-  data.password = await bcrypt.hash(data.password, 10); // hash password
+  const { email, password } = req.body;
+  const hashPassword = await bcrypt.hash(password, 10); // hash password
 
   try {
-    // Periksa jumlah pengguna dalam database
-    const existingUsers = await db.select().from(userTable);
-
-    // Tentukan role berdasarkan jumlah pengguna yang ada
-    data.role = existingUsers.length === 0 ? "admin" : "user";
+    const data = {
+      email,
+      password: hashPassword,
+      role: "admin",
+    };
 
     // Insert pengguna baru ke dalam tabel
     const [user] = await db.insert(userTable).values(data).returning();
-    res.status(200).json(user); // mengirimkan response JSON dengan status 200
+    res.status(200).json({
+      user,
+      message: "User registered successfully",
+    }); // mengirimkan response JSON dengan status 200
   } catch (error) {
     console.error(error); // log error untuk debugging
     res.status(500).json({ error: "Failed to register user" });
+  }
+}
+
+export async function getAllUsers(req: Request, res: Response) {
+  try {
+    const users = await db.select().from(userTable);
+    res.json({
+      users,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Failed to fetch users",
+    });
   }
 }
