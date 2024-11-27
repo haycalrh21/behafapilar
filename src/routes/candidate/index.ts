@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { createForm, getCandidates } from "./candidateController.js";
 import { createRouteHandler } from "uploadthing/express";
-import { uploadRouter } from "./uploadRouter.js";
 
 const router = Router();
 

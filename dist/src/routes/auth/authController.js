@@ -3,7 +3,6 @@ import { eq } from "drizzle-orm";
 import { userTable } from "../../db/userSchema.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import https from "https";
 const generateUserToken = (user) => {
     return jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET || "", {
         expiresIn: "30d",
@@ -60,77 +59,4 @@ export async function registerUser(req, res) {
         console.error(error); // log error untuk debugging
         res.status(500).json({ error: "Failed to register user" });
     }
-}
-export async function botPost(req, res) {
-    const chatId = "739761453"; // Ganti dengan chat ID yang ingin Anda kirim pesan
-    const message = req.body.message; // Pesan yang ingin dikirim dari body permintaan
-    const token = "7932535528:AAFO5hrI_Q9ZKFboAh5WWlWMIevQ5ormAHg"; // Ganti dengan token bot Anda
-    const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
-    https
-        .get(url, (response) => {
-        let data = "";
-        // Mengumpulkan data dari response
-        response.on("data", (chunk) => {
-            data += chunk;
-        });
-        // Setelah selesai menerima data
-        response.on("end", () => {
-            res.json({ success: true, data: JSON.parse(data) });
-        });
-    })
-        .on("error", (err) => {
-        console.error(err);
-        res
-            .status(500)
-            .json({ success: false, message: "Failed to send message" });
-    });
-}
-export async function getUpdates(req, res) {
-    const token = "7932535528:AAFO5hrI_Q9ZKFboAh5WWlWMIevQ5ormAHg"; // Ganti dengan token bot Anda
-    const url = `https://api.telegram.org/bot${token}/getUpdates`;
-    https
-        .get(url, (response) => {
-        let data = "";
-        // Mengumpulkan data dari response
-        response.on("data", (chunk) => {
-            data += chunk;
-        });
-        // Setelah selesai menerima data
-        response.on("end", () => {
-            try {
-                const jsonData = JSON.parse(data);
-                if (jsonData.ok && jsonData.result) {
-                    // Mengambil pesan dari data yang diterima
-                    const messages = jsonData.result.map((update) => ({
-                        id: update.message?.message_id || "No ID", // Menambahkan message_id
-                        text: update.message?.text || "",
-                        date: update.message?.date || "",
-                        from: update.message?.from?.username || "Unknown",
-                    }));
-                    // Mengirimkan data pesan ke frontend
-                    res.json({ success: true, messages });
-                }
-                else {
-                    res.status(500).json({
-                        success: false,
-                        message: "Failed to fetch updates",
-                    });
-                }
-            }
-            catch (error) {
-                console.error("Error parsing JSON:", error);
-                res.status(500).json({
-                    success: false,
-                    message: "Failed to parse response data",
-                });
-            }
-        });
-    })
-        .on("error", (err) => {
-        console.error("Request error:", err);
-        res.status(500).json({
-            success: false,
-            message: "Failed to get updates",
-        });
-    });
 }
